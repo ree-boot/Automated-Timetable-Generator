@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Table Generator</title>
+</head>
+<body>
+    <h1>Automatic Timetable Generator</h1>
+    <form id="timetable-form">
+        <label for="subjects">Subjects (comma separated):</label>
+        <input type="text" id="subjects" name="subjects" required><br><br>
+
+        <label for="start-time">Starting Time (24hr format, e.g., 9:00):</label>
+        <input type="text" id="start-time" name="start-time" required><br><br>
+
+        <label for="total-classes">Classes per Week (comma separated, corresponding to subjects):</label>
+        <input type="text" id="total-classes" name="total-classes" required><br><br>
+
+        <button type="submit">Generate Timetable</button>
+    </form>
+
+    <h2>Generated Timetable:</h2>
+    <pre id="timetable-output"></pre>
+
+    <script>
+        document.getElementById('timetable-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const subjects = document.getElementById('subjects').value.split(',');
+            const startTime = document.getElementById('start-time').value;
+            const totalClasses = document.getElementById('total-classes').value.split(',').map(Number);
+
+            const data = {
+                subjects: subjects,
+                start_time: startTime,
+                total_classes: totalClasses
+            };
+
+            fetch('/generate_timetable', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(timetable => {
+                document.getElementById('timetable-output').textContent = JSON.stringify(timetable, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
